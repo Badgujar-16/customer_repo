@@ -1,0 +1,11 @@
+http:
+  port: "8086"
+  
+db:
+  host: "34.132.96.74"
+  port: "3306"
+  user: "root"
+  password: "Infy@1234"
+  database: "Project"
+req:
+  host: "localhost"

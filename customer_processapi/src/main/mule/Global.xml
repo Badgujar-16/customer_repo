@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd 
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<configuration-properties doc:name="Configuration properties" doc:id="34b33caa-1e69-4849-9a9c-3119c758e09b" file="CustomerP.yaml" />
+
+ <http:listener-config name="customerprocessapi-httpListenerConfig">
+        <http:listener-connection host="0.0.0.0" port="${http.port}" />
+    </http:listener-config>
+<db:config name="Database_Config" doc:name="Database Config" doc:id="fa3555dc-547c-4808-abcb-bb3d0dc3c470" >
+		<db:my-sql-connection host="${db.host}" port="${db.port}" user="${db.user}" password="${db.password}" database="${db.database}" />
+	</db:config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="4c5cadd8-7392-45a1-b38d-0dac5f8a2be1" >
+		<http:request-connection host="${req.host}" />
+	</http:request-config>	
+	
+	
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="0d605beb-4cec-4049-9859-6b29f074fbaf" >
+		<email:smtp-connection host="smtp.gmail.com" user="sowmya0249@gmail.com" password="Sony@0249" port="587">
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="14100903-c8db-42ae-93d3-4451d20a5b4e" >
+		<file:connection workingDir="F:\complaints" />
+	</file:config>
+
+
+
+
+
+
+</mule>

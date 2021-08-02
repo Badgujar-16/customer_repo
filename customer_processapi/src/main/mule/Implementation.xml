@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd 
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd 
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	
+	<flow name="PostCustomerDetailsFlow" doc:id="0b10295d-9553-4cee-9949-e3343ff594dc" >
+		<http:request method="POST" doc:name="Request" doc:id="f1c6099c-1fcb-4159-aaff-6fe6b662789a" config-ref="HTTP_Request_configuration" url="http://customersproject.us-e2.cloudhub.io/api/customers"/>
+	</flow>
+	<flow name="GetCustomerByIdFlow" doc:id="34f0aecd-a2d2-4129-80bb-7436d2f48094" >
+		<http:request method="GET" doc:name="Request" doc:id="99773fdf-bd6f-4769-a114-b9addb66666d" config-ref="HTTP_Request_configuration" url="http://customersproject.us-e2.cloudhub.io/api/customers/{ID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	ID : attributes.uriParams.ID
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="DeleteCustomerByIdFlow" doc:id="d3572569-e918-441c-a96e-07a1f8263023" >
+		<http:request method="DELETE" doc:name="Request" doc:id="705ca597-788d-4329-9eee-266753e55cf4" config-ref="HTTP_Request_configuration" url="http://customersproject.us-e2.cloudhub.io/api/customers/{ID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	ID : attributes.uriParams.ID
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="ModifyCustomerDetailsbyId" doc:id="6e0a6cdb-ea5a-48b9-8576-83d9e12e3851" >
+		<http:request method="PATCH" doc:name="Request" doc:id="75db7c40-3f62-4eba-b273-1e20686c208f" config-ref="HTTP_Request_configuration" url="http://customersproject.us-e2.cloudhub.io/api/customers/{ID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	ID : attributes.uriParams.ID
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="GetAllComplaintsFlow" doc:id="cad9d046-c8b3-4a0a-b423-057acc1818c5" >
+		<set-variable value="#[message.attributes.uriParams.'ID']" doc:name="Set Variable" doc:id="9e9cc820-1227-4450-8a05-b65535103c3c" variableName="Id"/>
+		<http:request method="GET" doc:name="Request" doc:id="d5836f7b-5785-481e-ac3e-143bc4dce03d" config-ref="HTTP_Request_configuration" url="http://complaintsproject.us-e2.cloudhub.io/api/complaints">
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="b1c5c662-ef7c-4998-af2d-befeb0918e64" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload filter($.customerNumber == vars.Id)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+
+</flow>
+	<flow name="PostComplaintsFlow" doc:id="f513753d-0773-4a0e-b447-ba2e3ee76d48" >
+		<http:request method="POST" doc:name="Request" doc:id="7d871c43-56a1-4e84-8d89-a54ae6b9e4d1" config-ref="HTTP_Request_configuration" url="http://complaintsproject.us-e2.cloudhub.io/api/complaints"/>
+		<email:send doc:id="898a9873-4e17-4e6a-a7dd-14a2d4e5bc57" config-ref="Email_SMTP" fromAddress="sowmya0249@gmail.com" subject='"Registration Of Complaint"'>
+			<email:to-addresses >
+				<email:to-address value="saikumarshirtpocket@gmail.com" />
+				<email:to-address value="omvalkunde2@gmail.com" />
+				<email:to-address value="sowmya02491@gmail.com"/>
+			
+</email:to-addresses>
+			<email:body contentType="text/plain">
+				<email:content ><![CDATA[#[payload.message]]]></email:content>
+			</email:body>
+		</email:send>
+	</flow>
+	<flow name="GetComplaintbyIdFlow" doc:id="dbafd607-1d8b-45b6-89de-712fcb0bec22" >
+		<http:request method="GET" doc:name="Request" doc:id="6754a98c-7082-49bc-96d2-ce5d9ba94aed" config-ref="HTTP_Request_configuration" url="http://complaintsproject.us-e2.cloudhub.io/api/complaints/{CID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	CID : attributes.uriParams.CID
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="38deda17-d35e-40eb-bfa7-2ef2dca7c33a" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="Comp_Payload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="orderId" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.orderNumber]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="3e83662c-931b-4a00-951f-7d4f310ee3f6" config-ref="HTTP_Request_configuration" url="http://ordersproject.us-e2.cloudhub.io/api/orders/{ID}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	ID : vars.orderId
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="eefe1ff7-a10d-4797-ba6d-139f56f26d36">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="Order_payload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+		
+]]></ee:set-variable>
+				<ee:set-variable variableName="productCode" ><![CDATA[%dw 2.0
+output application/json
+---
+payload.productCode]]></ee:set-variable>
+			</ee:variables>
+		
+</ee:transform>
+		<http:request method="GET" doc:name="Request" doc:id="c05c1eed-2153-4260-aa1d-af96ec1bc613" config-ref="HTTP_Request_configuration" url="http://productsproject.us-e2.cloudhub.io/api/products/{PID}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	PID : vars.productCode
+}]]]></http:uri-params>
+		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="d779d8b8-c793-40db-99e5-4f8ce4983f3b">
+			<ee:message>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="Product_Payload" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		
+</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d918501e-13a2-452d-8117-024f9ca8bacf">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	Complaints : {
+		CustomerNumber : vars.Comp_Payload.customerNumber,
+		Order_Details : {
+			OrderId : vars.orderId,
+			OrderDate: vars.Order_payload.orderDate
+				},
+		Product_details: {
+			productId : vars.productCode,
+			productName : vars.Product_Payload.ProductName,
+			productCost : vars.Product_Payload.MSRP
+			}	
+				
+				
+				
+				}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	
+</flow>
+	<flow name="DeleteComplaintbyIdFlow" doc:id="a6fed3c1-062b-46c7-9ee1-93f6dbccc495" >
+		<http:request method="DELETE" doc:name="Request" doc:id="da9fd2eb-4e7f-454b-92b1-acc508d7ff5b" config-ref="HTTP_Request_configuration" url="http://complaintsproject.us-e2.cloudhub.io/api/complaints/{CID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	CID : attributes.uriParams.CID
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	<flow name="ModifComplaintByIdFlow" doc:id="e59023a0-6c52-44b3-bc00-330608e910fe" >
+		<http:request method="PATCH" doc:name="Request" doc:id="3f514d4f-d799-4344-ba30-7626be589538" config-ref="HTTP_Request_configuration" url="http://complaintsproject.us-e2.cloudhub.io/api/complaints/{CID}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	CID : attributes.uriParams.CID
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+	
+	
+	
+	
+	
+	
+	
+	
+	</mule>
